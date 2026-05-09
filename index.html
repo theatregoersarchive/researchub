@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theatre Hub</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&display=swap');
+
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --border: #2a2a2a;
+    --text: #e8e4dc;
+    --muted: #6b6660;
+    --accent-uk: #c8a96e;
+    --accent-fr: #8fb3c8;
+    --accent-pub: #b8c89e;
+    --accent-be: #c8a0c0;
+    --tag-bg: #1e1e1e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 40px 48px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  header span {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  nav {
+    padding: 16px 48px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    border-radius: 2px;
+  }
+
+  .tab:hover { color: var(--text); border-color: #444; }
+  .tab.active { color: var(--bg); background: var(--text); border-color: var(--text); }
+
+  main { padding: 32px 48px; }
+
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--muted);
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  /* PUBLISHERS */
+  .pub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .pub-card {
+    background: var(--surface);
+    padding: 20px;
+    transition: background 0.15s;
+  }
+
+  .pub-card:hover { background: #1c1c1c; }
+
+  .pub-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-pub);
+    margin-bottom: 4px;
+  }
+
+  .pub-desc {
+    color: var(--muted);
+    font-size: 11px;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .pub-links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .pub-link {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.15s;
+  }
+
+  .pub-link:hover {
+    border-color: var(--accent-pub);
+    color: var(--accent-pub);
+  }
+
+  .pub-link::after { content: '↗'; font-size: 10px; }
+
+  /* THEATRES */
+  .theatre-region {
+    margin-bottom: 32px;
+  }
+
+  .region-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .theatre-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .theatre-card {
+    background: var(--surface);
+    padding: 14px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background 0.15s;
+    border-left: 2px solid transparent;
+  }
+
+  .theatre-card:hover {
+    background: #1c1c1c;
+  }
+
+  .theatre-card.uk:hover { border-left-color: var(--accent-uk); }
+  .theatre-card.fr:hover { border-left-color: var(--accent-fr); }
+  .theatre-card.be:hover { border-left-color: var(--accent-be); }
+
+  .theatre-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 2px;
+    line-height: 1.3;
+  }
+
+  .theatre-city {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .theatre-tag {
+    display: inline-block;
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    margin-top: 6px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .tag-uk { background: rgba(200,169,110,0.12); color: var(--accent-uk); }
+  .tag-fr { background: rgba(143,179,200,0.12); color: var(--accent-fr); }
+  .tag-be { background: rgba(200,160,192,0.12); color: var(--accent-be); }
+  .tag-national { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+  /* RESOURCES */
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .resource-card {
+    background: var(--surface);
+    padding: 16px;
+    text-decoration: none;
+    display: block;
+    transition: background 0.15s;
+  }
+
+  .resource-card:hover { background: #1c1c1c; }
+
+  .resource-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .resource-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Theatre Hub</h1>
+  <span>Playtext Publishers · Theatres · Resources</span>
+</header>
+
+<nav>
+  <button class="tab active" onclick="showSection('publishers')">Publishers</button>
+  <button class="tab" onclick="showSection('uk')">UK Theatres</button>
+  <button class="tab" onclick="showSection('france')">French Theatres</button>
+  <button class="tab" onclick="showSection('belgium')">Belgian Theatres</button>
+  <button class="tab" onclick="showSection('resources')">Resources</button>
+</nav>
+
+<main>
+
+  <!-- PUBLISHERS -->
+  <section id="publishers" class="section visible">
+    <p class="section-title">Playtext publishers — new releases & catalogues</p>
+    <div class="pub-grid">
+
+      <div class="pub-card">
+        <div class="pub-name">Methuen Drama</div>
+        <div class="pub-desc">Bloomsbury imprint. Leading British & European drama. In-yer-face, political theatre, contemporary classics.</div>
+        <div class="pub-links">
+          <a href="https://www.bloomsbury.com/uk/discover/bloomsbury-academic/methuen-drama/plays/" target="_blank" class="pub-link">Plays</a>
+          <a href="https://www.bloomsbury.com/uk/discover/bloomsbury-academic/methuen-drama/" target="_blank" class="pub-link">Methuen Drama Hub</a>
+        </div>
+      </div>
+
+      <div class="pub-card">
+        <div class="pub-name">Faber & Faber Drama</div>
+        <div class="pub-desc">Independent publisher. Tom Stoppard, Harold Pinter, Caryl Churchill, David Hare. Strong contemporary list.</div>
+        <div class="pub-links">
+          <a href="https://www.faber.co.uk/product-category/drama/" target="_blank" class="pub-link">Drama List</a>
+          <a href="https://www.faber.co.uk/journal/new-books-preview-april-to-june/" target="_blank" class="pub-link">New Books Preview</a>
+        </div>
+      </div>
+
+      <div class="pub-card">
+        <div class="pub-name">Nick Hern Books</div>
+        <div class="pub-desc">Specialist theatre publisher. Jez Butterworth, Caryl Churchill, Mike Bartlett, debbie tucker green. Strong contemporary British & Irish list.</div>
+        <div class="pub-links">
+          <a href="https://www.nickhernbooks.co.uk/plays-to-perform/new-releases" target="_blank" class="pub-link">New Releases</a>
+          <a href="https://www.nickhernbooks.co.uk/news/" target="_blank" class="pub-link">News</a>
+        </div>
+      </div>
+
+      <div class="pub-card">
+        <div class="pub-name">Dramatists Play Service</div>
+        <div class="pub-desc">Leading US publisher & licensing agent. Bruce Norris, Paula Vogel, Lynn Nottage, Suzan-Lori Parks. (Concord Theatricals 산하)</div>
+        <div class="pub-links">
+          <a href="https://www.dramatists.com/" target="_blank" class="pub-link">Catalogue</a>
+          <a href="https://www.concordtheatricals.com/new-releases" target="_blank" class="pub-link">New Releases (Concord)</a>
+        </div>
+      </div>
+
+      <div class="pub-card">
+        <div class="pub-name">Les Solitaires Intempestifs</div>
+        <div class="pub-desc">French independent. Contemporary francophone drama. Wajdi Mouawad, Joël Pommerat, Lars Norén, Bernard-Marie Koltès.</div>
+        <div class="pub-links">
+          <a href="https://www.solitairesintempestifs.com/catalogue/" target="_blank" class="pub-link">Catalogue</a>
+          <a href="https://www.solitairesintempestifs.com/" target="_blank" class="pub-link">Site</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- UK THEATRES -->
+  <section id="uk" class="section">
+    <p class="section-title">UK theatres — what's on</p>
+
+    <div class="theatre-region">
+      <div class="region-label">London — Major</div>
+      <div class="theatre-grid">
+        <a href="https://www.nationaltheatre.org.uk/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">National Theatre</div>
+          <div class="theatre-city">London — South Bank</div>
+          <span class="theatre-tag tag-national">Olivier · Lyttelton · Dorfman</span>
+        </a>
+        <a href="https://www.oldvictheatre.com/whats-on" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">The Old Vic</div>
+          <div class="theatre-city">London — Waterloo</div>
+        </a>
+        <a href="https://www.donmarwarehouse.com/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Donmar Warehouse</div>
+          <div class="theatre-city">London — Covent Garden</div>
+        </a>
+        <a href="https://www.youngvic.org/whats-on" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Young Vic</div>
+          <div class="theatre-city">London — Waterloo</div>
+        </a>
+        <a href="https://almeida.co.uk/whats-on" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Almeida Theatre</div>
+          <div class="theatre-city">London — Islington</div>
+        </a>
+        <a href="https://www.hampsteadtheatre.com/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Hampstead Theatre</div>
+          <div class="theatre-city">London — Hampstead</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="theatre-region">
+      <div class="region-label">London — Independent & Fringe</div>
+      <div class="theatre-grid">
+        <a href="https://royalcourttheatre.com/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Royal Court Theatre</div>
+          <div class="theatre-city">London — Sloane Square</div>
+        </a>
+        <a href="https://www.bushtheatre.co.uk/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Bush Theatre</div>
+          <div class="theatre-city">London — Shepherd's Bush</div>
+        </a>
+        <a href="https://lyric.co.uk/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Lyric Hammersmith</div>
+          <div class="theatre-city">London — Hammersmith</div>
+        </a>
+        <a href="https://sohotheatre.com/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Soho Theatre</div>
+          <div class="theatre-city">London — Soho</div>
+        </a>
+        <a href="https://sohoplace.org/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">@sohoplace</div>
+          <div class="theatre-city">London — Soho</div>
+        </a>
+        <a href="https://finboroughtheatre.co.uk/productions/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Finborough Theatre</div>
+          <div class="theatre-city">London — Earl's Court</div>
+        </a>
+        <a href="https://www.jermynstreettheatre.co.uk/now-next/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Jermyn Street Theatre</div>
+          <div class="theatre-city">London — St James's</div>
+        </a>
+        <a href="https://kingsheadtheatre.com/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">King's Head Theatre</div>
+          <div class="theatre-city">London — Islington</div>
+        </a>
+        <a href="https://southwarkplayhouse.co.uk/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Southwark Playhouse</div>
+          <div class="theatre-city">London — Bermondsey</div>
+        </a>
+        <a href="https://greenwichtheatre.org.uk/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Greenwich Theatre</div>
+          <div class="theatre-city">London — Greenwich</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="theatre-region">
+      <div class="region-label">London — West End</div>
+      <div class="theatre-grid">
+        <a href="https://www.theambassadorstheatre.co.uk/whats-on" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Ambassador's Theatre</div>
+          <div class="theatre-city">London — West End</div>
+        </a>
+        <a href="https://www.thedukeofyorks.com/whats-on" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Duke of York's Theatre</div>
+          <div class="theatre-city">London — West End</div>
+        </a>
+        <a href="https://www.thesavoytheatre.com/whats-on" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Savoy Theatre</div>
+          <div class="theatre-city">London — Strand</div>
+        </a>
+        <a href="https://thelyrictheatre.co.uk/whats-on" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Lyric Theatre</div>
+          <div class="theatre-city">London — West End</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="theatre-region">
+      <div class="region-label">Bristol</div>
+      <div class="theatre-grid">
+        <a href="https://bristololdvic.org.uk/whats-on" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Bristol Old Vic</div>
+          <div class="theatre-city">Bristol</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="theatre-region">
+      <div class="region-label">Edinburgh</div>
+      <div class="theatre-grid">
+        <a href="https://www.traverse.co.uk/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Traverse Theatre</div>
+          <div class="theatre-city">Edinburgh</div>
+          <span class="theatre-tag tag-national">New Writing</span>
+        </a>
+        <a href="https://lyceum.org.uk/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">The Lyceum</div>
+          <div class="theatre-city">Edinburgh</div>
+        </a>
+        <a href="https://www.summerhallarts.co.uk/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Summerhall</div>
+          <div class="theatre-city">Edinburgh</div>
+          <span class="theatre-tag tag-national">Fringe</span>
+        </a>
+        <a href="https://www.thespaceuk.com/edinburgh/thespace-surgeons-hall" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Surgeons' Hall</div>
+          <div class="theatre-city">Edinburgh</div>
+          <span class="theatre-tag tag-national">Fringe</span>
+        </a>
+        <a href="https://www.nationaltheatrescotland.com/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">National Theatre of Scotland</div>
+          <div class="theatre-city">Scotland</div>
+          <span class="theatre-tag tag-national">Touring</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="theatre-region">
+      <div class="region-label">Dublin</div>
+      <div class="theatre-grid">
+        <a href="https://www.abbeytheatre.ie/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Abbey Theatre</div>
+          <div class="theatre-city">Dublin</div>
+          <span class="theatre-tag tag-national">National Theatre of Ireland</span>
+        </a>
+        <a href="https://gatetheatre.ie/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Gate Theatre</div>
+          <div class="theatre-city">Dublin</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="theatre-region">
+      <div class="region-label">Wales</div>
+      <div class="theatre-grid">
+        <a href="https://www.welshnationaltheatre.com/whats-on/" target="_blank" class="theatre-card uk">
+          <div class="theatre-name">Welsh National Theatre</div>
+          <div class="theatre-city">Wales</div>
+          <span class="theatre-tag tag-national">Touring</span>
+        </a>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- FRENCH THEATRES -->
+  <section id="france" class="section">
+    <p class="section-title">Théâtres français — à l'affiche</p>
+
+    <div class="theatre-region">
+      <div class="region-label">Paris</div>
+      <div class="theatre-grid">
+        <a href="https://www.colline.fr/spectacles" target="_blank" class="theatre-card fr">
+          <div class="theatre-name">Théâtre de la Colline</div>
+          <div class="theatre-city">Paris — 20e</div>
+          <span class="theatre-tag tag-national">Théâtre National</span>
+        </a>
+        <a href="https://tgp.theatregerardphilipe.com/saison/" target="_blank" class="theatre-card fr">
+          <div class="theatre-name">Théâtre Gérard Philipe</div>
+          <div class="theatre-city">Saint-Denis</div>
+          <span class="theatre-tag tag-national">CDN</span>
+        </a>
+        <a href="https://theatre13.com/saison/" target="_blank" class="theatre-card fr">
+          <div class="theatre-name">Théâtre 13</div>
+          <div class="theatre-city">Paris — 13e</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="theatre-region">
+      <div class="region-label">Île-de-France / Régions</div>
+      <div class="theatre-grid">
+        <a href="https://nanterre-amandiers.com/saison/" target="_blank" class="theatre-card fr">
+          <div class="theatre-name">Nanterre-Amandiers</div>
+          <div class="theatre-city">Nanterre</div>
+          <span class="theatre-tag tag-national">CDN</span>
+        </a>
+        <a href="https://www.lequartz.com/saison/" target="_blank" class="theatre-card fr">
+          <div class="theatre-name">Le Quartz</div>
+          <div class="theatre-city">Brest</div>
+          <span class="theatre-tag tag-national">Scène Nationale</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="theatre-region">
+      <div class="region-label">Ressources / Diffusion</div>
+      <div class="theatre-grid">
+        <a href="https://www.onda.fr/en" target="_blank" class="theatre-card fr">
+          <div class="theatre-name">ONDA</div>
+          <div class="theatre-city">Office National de Diffusion Artistique</div>
+        </a>
+        <a href="https://www.artcena.fr/" target="_blank" class="theatre-card fr">
+          <div class="theatre-name">Artcena</div>
+          <div class="theatre-city">Centre national des arts du cirque, de la rue et du théâtre</div>
+        </a>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- BELGIUM -->
+  <section id="belgium" class="section">
+    <p class="section-title">Belgische theaters — wat speelt er</p>
+
+    <div class="theatre-region">
+      <div class="region-label">Gent</div>
+      <div class="theatre-grid">
+        <a href="https://www.ntgent.be/en" target="_blank" class="theatre-card be">
+          <div class="theatre-name">NTGent</div>
+          <div class="theatre-city">Gent</div>
+          <span class="theatre-tag tag-be">National</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="theatre-region">
+      <div class="region-label">Antwerpen</div>
+      <div class="theatre-grid">
+        <a href="https://toneelhuis.be/en/" target="_blank" class="theatre-card be">
+          <div class="theatre-name">Toneelhuis</div>
+          <div class="theatre-city">Antwerpen</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="theatre-region">
+      <div class="region-label">Brussel / Bruxelles</div>
+      <div class="theatre-grid">
+        <a href="https://kaaitheater.be/en" target="_blank" class="theatre-card be">
+          <div class="theatre-name">Kaaitheater</div>
+          <div class="theatre-city">Brussel</div>
+          <span class="theatre-tag tag-be">Experimental</span>
+        </a>
+        <a href="https://monty.be/" target="_blank" class="theatre-card be">
+          <div class="theatre-name">Monty</div>
+          <div class="theatre-city">Antwerpen</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="theatre-region">
+      <div class="region-label">Diffusion / Resources</div>
+      <div class="theatre-grid">
+        <a href="https://www.kunsten.be/" target="_blank" class="theatre-card be">
+          <div class="theatre-name">Kunsten.be</div>
+          <div class="theatre-city">플람스 공연예술 플랫폼</div>
+        </a>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- RESOURCES -->
+  <section id="resources" class="section">
+    <p class="section-title">비평 · 리서치 · 아카이브</p>
+    <div class="resource-grid">
+      <a href="https://exeuntmagazine.com/" target="_blank" class="resource-card">
+        <div class="resource-name">Exeunt Magazine</div>
+        <div class="resource-desc">UK 비평 중심. 계급·정치적 연극 다룸.</div>
+      </a>
+      <a href="https://www.americantheatre.org/" target="_blank" class="resource-card">
+        <div class="resource-name">American Theatre</div>
+        <div class="resource-desc">미국 연극 비평 + 소식. TCG 발행.</div>
+      </a>
+      <a href="https://howlround.com/" target="_blank" class="resource-card">
+        <div class="resource-name">HowlRound</div>
+        <div class="resource-desc">오픈 액세스 연극 저널. 실천 중심 에세이.</div>
+      </a>
+      <a href="https://www.dramaonlinelibrary.com/" target="_blank" class="resource-card">
+        <div class="resource-name">Drama Online</div>
+        <div class="resource-desc">Methuen, Faber, NHB 텍스트 DB. 기관 구독 필요.</div>
+      </a>
+      <a href="https://www.theguardian.com/stage/theatre" target="_blank" class="resource-card">
+        <div class="resource-name">The Guardian — Theatre</div>
+        <div class="resource-desc">영국 연극 리뷰 + 소식.</div>
+      </a>
+      <a href="https://www.mouvement.net/" target="_blank" class="resource-card">
+        <div class="resource-name">Mouvement</div>
+        <div class="resource-desc">프랑스어권 공연예술 비평 + 소식. 유럽 씬 포함.</div>
+      </a>
+      <a href="https://www.lesarchivesduspectacle.net/" target="_blank" class="resource-card">
+        <div class="resource-name">Les Archives du Spectacle</div>
+        <div class="resource-desc">프랑스어권 공연 아카이브 DB. 연출가·배우·극단 크레딧 검색 가능.</div>
+      </a>
+      <a href="https://alternativestheatrales.be/" target="_blank" class="resource-card">
+        <div class="resource-name">Alternatives Théâtrales</div>
+        <div class="resource-desc">1979년 창간 프랑스·벨기에 공연예술 비평지. 45년 아카이브.</div>
+      </a>
+      <a href="https://www.thestage.co.uk" target="_blank" class="resource-card">
+        <div class="resource-name">The Stage</div>
+        <div class="resource-desc">영국 연극 업계 소식. 초연 정보 및 산업 동향.</div>
+      </a>
+      <a href="https://www.intermissionmagazine.ca" target="_blank" class="resource-card">
+        <div class="resource-name">Intermission Magazine</div>
+        <div class="resource-desc">캐나다 연극 비평 + 아티스트 인터뷰.</div>
+      </a>
+      <a href="https://www.abouttheartists.com/" target="_blank" class="resource-card">
+        <div class="resource-name">AboutTheArtists</div>
+        <div class="resource-desc">극작가·연출가·디자이너 크레딧 DB. 260만 개 이상 크레딧.</div>
+      </a>
+      <a href="https://www.sfac.or.kr/theater/WZ020400/webzine_list.do" target="_blank" class="resource-card">
+        <div class="resource-name">웹진 연극in</div>
+        <div class="resource-desc">한국 연극 비평 웹진. 순간비평 등 실험적 형식의 글 포함.</div>
+      </a>
+      <a href="https://www.kci.go.kr" target="_blank" class="resource-card">
+        <div class="resource-name">KCI 학술지</div>
+        <div class="resource-desc">한국 연극학 논문 DB. 공연과이론, 연극평론 등.</div>
+      </a>
+      <a href="https://catalogue.nationaltheatre.org.uk/calmview/" target="_blank" class="resource-card">
+        <div class="resource-name">NT Production Database</div>
+        <div class="resource-desc">NT 1963년 이후 전체 프로덕션 캐스트·스태프 아카이브.</div>
+      </a>
+      <a href="https://www.ayoungertheatre.com/" target="_blank" class="resource-card">
+        <div class="resource-name">A Younger Theatre</div>
+        <div class="resource-desc">에든버러 프린지 중심 영국 신작 비평.</div>
+      </a>
+      <a href="https://www.critical-stages.org/" target="_blank" class="resource-card">
+        <div class="resource-name">Critical Stages</div>
+        <div class="resource-desc">IATC 국제 연극비평 저널. 영어·프랑스어.</div>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer style="padding: 24px 48px; border-top: 1px solid var(--border); color: var(--muted); font-size: 11px; letter-spacing: 0.06em;">
+  이원림 &nbsp;·&nbsp; <a href="mailto:meetheatregoers@gmail.com" style="color: var(--muted); text-decoration: none;">meetheatregoers@gmail.com</a>
+</footer>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>
